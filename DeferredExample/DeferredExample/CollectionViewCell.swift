@@ -49,22 +49,18 @@ public class CollectionViewCell: UICollectionViewCell {
                 self._activityIndicatorView.startAnimating();
                 return EnqueueResult();
             }
-            .chain {[unowned self] value -> NSURLRequest in
+            .chainRequest {[unowned self] value -> NSURLRequest in
                 let url:NSURL? = NSURL(string: url)
                 let request:NSURLRequest = NSURLRequest(URL: url!);
                 return request;
             }
             .chain (queue: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {[unowned self] (response: NSURLResponse, data: NSData) -> EnqueueResult<UIImage> in
-                let img = UIImage(data:data);
-                if (img == nil) {
-                    var details: Dictionary = Dictionary(dictionaryLiteral:
-                        (NSLocalizedDescriptionKey, "Unable to create image from "+url)
-                        , ("ru.mperv.url.Key", url));
-                    return EnqueueResult(error: NSError(domain: "ru.mperv.DeferredExample.ErrorDomain"
-                        , code: 1, userInfo: details));
+                if let img = UIImage(data:data) {
+                    let newImage = CollectionViewCell.resizeImage(img, self.calcSmallImageSize(img));
+                    return EnqueueResult(newImage);
                 }
-                let newImage = CollectionViewCell.resizeImage(img!, self.calcSmallImageSize(img!));
-                return EnqueueResult(newImage);
+                var details: Dictionary = Dictionary(dictionaryLiteral: (NSLocalizedDescriptionKey, "Unable to create image from \(url)"), ("ru.mperv.url.Key", url));
+                return EnqueueResult(error: NSError(domain: "ru.mperv.DeferredExample.ErrorDomain", code: 1, userInfo: details));
             }
             .addErrback {[weak self] (error:NSError) -> Void in
                 // check if cell already used to show another image

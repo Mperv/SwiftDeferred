@@ -10,7 +10,7 @@ import Foundation
 
 extension Deferred{
     
-    public func chain(queue: dispatch_queue_t = dispatch_get_main_queue(), transform: (T)->(NSURLRequest)) -> Deferred<(NSURLResponse, NSData)> {
+    public func chainRequest(queue: dispatch_queue_t = dispatch_get_main_queue(), transform: (T)->(NSURLRequest)) -> Deferred<(NSURLResponse, NSData)> {
         
         return chain(queue: queue) { (newDeferred: Deferred<(NSURLResponse, NSData)>, value: T)->Void in
             let request: NSURLRequest = transform(value);

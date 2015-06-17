@@ -8,87 +8,117 @@
 
 import Foundation
 
+/*
+Type-safe, thread-safe and chainable Swift implementation of Deferred. Deferred represents work that is not finished.
+Deferred can be in three states:
+    - None: work in progress
+    - Fulfilled: work is finished successfully, result is available
+    - Rejected: work is finished unsuccessfully, error is available
+Once resolved (either fulfilled or rejected) Deferred should be unable to change its state.
+*/
 
 public class Deferred<T> {
-    private var _lock: NSLock = NSLock();
-    
-    private var _callbacks: Array<(T)->Void> = Array<(T)->Void>();
-    private var _errbacks: Array<(NSError)->Void> = Array<(NSError)->Void>();
+    private var _lock: NSLock = NSLock()
 
-    private var _state : DeferredState;
-    public var state: DeferredState { get {return _state; }}
-    
-    private var _value: T?;
-    public var value: T {get { return _value!; }}
-  
-    private var _error: NSError? = nil;
-    public var error: NSError {get { return _error!; }}
-    
-    public init(){
+    private var _callbacks: Array<(T) -> Void> = Array<(T) -> Void>()
+    private var _errbacks: Array<(NSError) -> Void> = Array<(NSError) -> Void>()
+
+    private var _state: DeferredState<T>
+    public var state: DeferredState<T> {
+        get {
+            return _state
+        }
+    }
+
+    public init() {
         _state = .None
     }
-    
-    public func addSyncCallback(callback: (T)->Void) -> Deferred<T> {
-        _lock.lock();
-        if _state == .None {
-            _callbacks.append(callback);
+
+    /*
+    Adds callback. It will be executed if Deferred fulfills.
+    Note: Callback executes on the same thread as 'fulfill'. 'fulfill' returns only when all callbacks has been executed.
+    */
+    public func addSyncCallback(callback: (T) -> Void) -> Deferred<T> {
+        _lock.lock()
+        switch _state {
+        case .None:
+            _callbacks.append(callback)
+            _lock.unlock()
+        case .Fulfilled(let value):
+            _lock.unlock()
+            callback(value.boxed)
+        case .Rejected(_ ):
+            _lock.unlock()
         }
-        if _state == .Fulfilment {
-            _lock.unlock();
-            callback(_value!);
-        } else {
-            _lock.unlock();
-        }
-        return self;
+        return self
     }
 
-    public func addSyncErrback(errback: (NSError)->Void) -> Deferred<T> {
-        _lock.lock();
-        if _state == .None {
-            _errbacks.append(errback);
+    /*
+    Adds errback. It will be executed if Deferred rejects.
+    Note: Errback executes on the same thread as 'reject'. 'reject' returns only when all errbacks has been executed.
+    */
+    public func addSyncErrback(errback: (NSError) -> Void) -> Deferred<T> {
+        _lock.lock()
+        switch _state {
+        case .None:
+            _errbacks.append(errback)
+            _lock.unlock()
+        case .Fulfilled(_ ):
+            _lock.unlock()
+        case .Rejected(let error):
+            _lock.unlock()
+            errback(error)
         }
-        if _state == .Error {
-            _lock.unlock();
-            errback(_error!);
-        } else {
-            _lock.unlock();
-        }
-        return self;
+        return self
     }
 
-    public func addSyncAlways(always: Void->Void) -> Deferred<T> {
-        addSyncCallback {(result:T)->Void in always()}
-        addSyncErrback {(error:NSError)->Void in always()}
-        return self;
-    }
-       
-    public func resolve(value: T) {
-        _lock.lock();
-        if (_state != .None) {
-            _lock.unlock();
-            return;
+    /*
+    Adds 'always' function. It will be executed if Deferred resolves (either by 'fulfill' or by 'reject').
+    Note: 'always' function executes on the same thread as 'fulfill' or 'reject'. 'fulfill' or 'reject' returns only when all 'always' functions has been executed.
+    */
+    public func addSyncAlways(always: Void -> Void) -> Deferred<T> {
+        addSyncCallback {
+            (result: T) -> Void in
+            always()
         }
-        _state = .Fulfilment
-        _value = value
-        _lock.unlock();
-        
+        addSyncErrback {
+            (error: NSError) -> Void in
+            always()
+        }
+        return self
+    }
+
+    /*
+    Resolves Deferred by setting Fulfilled status and fulfilment value. All added callbacks execute here also.
+    */
+    public func fulfill(value: T) {
+        _lock.lock()
+        if (_state.resolved) {
+            _lock.unlock()
+            return
+        }
+        _state = .Fulfilled(Box(value))
+        _lock.unlock()
+
         for callback in _callbacks {
-            callback(value);
+            callback(value)
         }
     }
 
+    /*
+    Resolves Deferred by setting Rejected status and error. All added errbacks execute here also.
+    */
     public func reject(error: NSError) {
-        _lock.lock();
-        if (_state != .None) {
-            _lock.unlock();
-            return;
+        _lock.lock()
+        if (_state.resolved) {
+            _lock.unlock()
+            return
         }
-        _state = .Error
-        _error = error;
-        _lock.unlock();
-        
+        _state = .Rejected(error)
+        _lock.unlock()
+
         for errback in _errbacks {
-            errback(error);
+            errback(error)
         }
     }
 }

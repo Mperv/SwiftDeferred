@@ -8,56 +8,117 @@
 
 import Foundation
 
-extension Deferred{
-    
-    public func addCallback(queue: dispatch_queue_t = dispatch_get_main_queue()
-        , callback: (T)->Void) -> Deferred<T> {
-        return addSyncCallback {(value:T) -> Void in
+extension Deferred {
+
+    /*
+    Adds asyncronous callback that executes in provided queue.
+    */
+    public func addCallback(queue: dispatch_queue_t, callback: (T) -> Void) -> Deferred<T> {
+        return addSyncCallback {
+            (value: T) -> Void in
             dispatch_async(queue) {
-                callback(value);
-            };
-        }
-    }
-    
-    public func addErrback(queue: dispatch_queue_t = dispatch_get_main_queue()
-        , errback: (NSError)->Void) -> Deferred<T> {
-        return addSyncErrback {(error: NSError) -> Void in
-            dispatch_async(queue) {
-                errback(error);
-            };
-        }
-    }
-    
-    public func addAlways(queue: dispatch_queue_t = dispatch_get_main_queue()
-        , always: Void->Void) -> Deferred<T> {
-        return addSyncAlways {Void -> Void in
-            dispatch_async(queue) {
-                always();
-            };
-        }
-    }
-    
-    public func chain<TOut>(queue: dispatch_queue_t = dispatch_get_main_queue()
-        , transform: (Deferred<TOut>, T)->Void) -> Deferred<TOut> {
-            var newDeferred = Deferred<TOut>();
-            addCallback(queue: queue) {(value: T)->Void in
-                transform(newDeferred, value);
-            };
-            addErrback(queue: queue) {(error: NSError)->Void in newDeferred.reject(error)}
-            
-            return newDeferred;
-    }
-    
-    public func chain<TOut>(queue: dispatch_queue_t = dispatch_get_main_queue()
-        , transform: (T)->(EnqueueResult<TOut>)) -> Deferred<TOut> {
-        return chain(queue: queue) { (newDeferred: Deferred<TOut>, value: T)->Void in
-            let result: EnqueueResult<TOut> = transform(value);
-            if (result.fulfiled) {
-                newDeferred.resolve(result.value);
-            } else {
-                newDeferred.reject(result.error);
+                callback(value)
             }
         }
     }
-    
+
+    /*
+    Adds asyncronous callback that executes in main queue.
+    */
+    public func addCallback(callback: (T) -> Void) -> Deferred<T> {
+        return addCallback(dispatch_get_main_queue(), callback: callback)
+    }
+
+    /*
+    Adds asyncronous errback that executes in provided queue.
+    */
+    public func addErrback(queue: dispatch_queue_t, errback: (NSError) -> Void) -> Deferred<T> {
+        return addSyncErrback {
+            (error: NSError) -> Void in
+            dispatch_async(queue) {
+                errback(error)
+            }
+        }
+    }
+
+    /*
+    Adds asyncronous errback that executes in main queue.
+    */
+    public func addErrback(errback: (NSError) -> Void) -> Deferred<T> {
+        return addErrback(dispatch_get_main_queue(), errback: errback)
+    }
+
+    /*
+    Adds asyncronous 'always' function that executes in provided queue.
+    */
+    public func addAlways(queue: dispatch_queue_t, always: Void -> Void) -> Deferred<T> {
+        return addSyncAlways {
+            Void -> Void in
+            dispatch_async(queue) {
+                always()
+            }
+        }
+    }
+
+    /*
+    Adds asyncronous 'always' function that executes in main queue.
+    */
+    public func addAlways(always: Void -> Void) -> Deferred<T> {
+        return addAlways(dispatch_get_main_queue(), always: always)
+    }
+
+    /*
+    Creates new Deferred. When chained Deferred fulfills 'transform' function is executed.
+    The result of 'transform' function resolves new Deferred.
+    'transform' function executes in provided queue.
+    */
+    public func chain<TOut>(queue: dispatch_queue_t, transform: (Deferred<TOut>, T) -> Void) -> Deferred<TOut> {
+        var newDeferred = Deferred<TOut>()
+        addCallback(queue) {
+            (value: T) -> Void in
+            transform(newDeferred, value)
+        }
+        addErrback(queue) {
+            (error: NSError) -> Void in
+            newDeferred.reject(error)
+        }
+        return newDeferred
+    }
+
+    /*
+    Creates new Deferred. When chained Deferred fulfills 'transform' function is executed.
+    The result of 'transform' function resolves new Deferred.
+    'transform' function executes in main queue.
+    */
+    public func chain<TOut>(transform: (Deferred<TOut>, T) -> Void) -> Deferred<TOut> {
+        return chain(dispatch_get_main_queue(), transform: transform)
+    }
+
+    /*
+    Creates new Deferred. When chained Deferred fulfills 'transform' function is executed.
+    The result of 'transform' function resolves new Deferred.
+    'transform' function executes in provided queue.
+    */
+    public func chain<TOut>(queue: dispatch_queue_t, transform: (T) -> (ChainResult<TOut>)) -> Deferred<TOut> {
+        return chain(queue) {
+            (newDeferred: Deferred<TOut>, value: T) -> Void in
+            let result: ChainResult<TOut> = transform(value)
+            switch result {
+            case .Fulfilment(let resultValue):
+                newDeferred.fulfill(resultValue.boxed)
+            case .Error(let error):
+                newDeferred.reject(error)
+            }
+        }
+    }
+
+    /*
+    Creates new Deferred. When chained Deferred fulfills 'transform' function is executed.
+    The result of 'transform' function resolves new Deferred.
+    'transform' function executes in main queue.
+    */
+    public func chain<TOut>(transform: (T) -> (ChainResult<TOut>)) -> Deferred<TOut> {
+        return chain(dispatch_get_main_queue(), transform: transform)
+    }
+
 }

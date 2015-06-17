@@ -1,64 +1,38 @@
 SwiftDeferred
 =============
+
+Type-safe, thread-safe and chainable Swift implementation of Deferred. Deferred represents work that is not finished.
+Deferred can be in three states:
+
+- None: work in progress
+- Fulfilled: work is finished successfully, result is available
+- Rejected: work is finished unsuccessfully, error is available
+
+Once resolved (either fulfilled or rejected) Deferred should be unable to change its state.
+
 Usage:
 
-        let deferred = Deferred<Int>();
-        deferred
-            .chain {EnqueueResult($0+10)}
-            .chain {EnqueueResult($0+100)}
-            .chain {value->EnqueueResult<Int> in
-                println(value);
-                return EnqueueResult(value+100);
-            }
-            .chain {value->EnqueueResult<Void> in
-                println(value);
-                return EnqueueResult()
-        }
-        deferred.resolve(1);
-        
-or
-        
-        let deferred2 = Deferred<Void>();
-        deferred2
-            .chain {[unowned self] (value:Void) -> EnqueueResult<Void> in
-                self._activityIndicatorView.hidden = false;
-                self._activityIndicatorView.startAnimating();
-                return EnqueueResult();
-            }
-            .chain {[unowned self] value -> NSURLRequest in
-                let url:NSURL? = NSURL(string: url)
-                let request:NSURLRequest = NSURLRequest(URL: url!);
-                return request;
-            }
-            .chain (queue: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {[unowned self] (response: NSURLResponse, data: NSData) -> EnqueueResult<UIImage> in
-                let img = UIImage(data:data);
-                if (img == nil) {
-                    var details: Dictionary = Dictionary(dictionaryLiteral:
-                        (NSLocalizedDescriptionKey, "Unable to create image from "+url)
-                        , ("ru.mperv.url.Key", url));
-                    return EnqueueResult(error: NSError(domain: "ru.mperv.DeferredExample.ErrorDomain"
-                        , code: 1, userInfo: details));
-                }
-                let newImage = CollectionViewCell.resizeImage(img!, self.calcSmallImageSize(img!));
-                return EnqueueResult(newImage);
-            }
-            .addErrback {[weak self] (error:NSError) -> Void in
-                // check if cell already used to show another image
-                if (self == nil) || (self!._url != url) { return; }
-                
-                self!.backgroundColor = UIColor(red: 0.7, green: 0.1, blue: 0.2, alpha: 0.3);
-            }
-            .addCallback {[weak self] (image: UIImage) -> Void in
-                // check if cell already used to show another image
-                if (self == nil) || (self!._url != url) { return; }
-                
-                self!._imageView.image = image;
-                self!._imageView.hidden = false;
-            }
-            .addAlways {
-                // check if cell already used to show another image
-                if (self._url != url) { return; }
-                
-                self._activityIndicatorView.hidden = true;
-        }
-        deferred2.resolve();
+```swift
+let deferred = Deferred<Int>()
+deferred.addCallback {
+    println($0)
+}
+```
+Will print `2` after `deferred.fulfill(2)` is called.
+
+The most interesting part is chaining. Every function receives a result of previous function as a parameter. It's also possible to specify a dispatch queue for each function.
+
+```swift
+let deferred = Deferred<Int>();
+deferred
+.chain {
+    ChainResult($0 + 10)
+}
+.chain(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+    return ChainResult($0 + 30)
+}
+.addCallback {
+    println($0);
+}
+```
+Will print `42` after `deferred.fulfill(2)` is called. Here, the second function will be executed in background queue while the first and the third will be executed in main queue (default value).

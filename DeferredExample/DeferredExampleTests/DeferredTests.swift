@@ -11,15 +11,15 @@ import XCTest
 
 class DeferredTests: XCTestCase {
 
-    var callbackResults: Int = 0
-    var errbackResults: Int = 0
-    var alwaysResults: Int = 0
+    var callbackResult: Int = 0
+    var errbackResult: Int = 0
+    var alwaysResult: Int = 0
 
     override func setUp() {
         super.setUp()
-        callbackResults = 0
-        errbackResults = 0
-        alwaysResults = 0
+        callbackResult = 0
+        errbackResult = 0
+        alwaysResult = 0
     }
 
     override func tearDown() {
@@ -31,7 +31,7 @@ class DeferredTests: XCTestCase {
         let deferred = Deferred<Int>()
 
         deferred.addSyncAlways {
-            self.alwaysResults += 50
+            self.alwaysResult += 50
         }
 
         let group: dispatch_group_t = dispatch_group_create()
@@ -40,13 +40,14 @@ class DeferredTests: XCTestCase {
             let a = i
             dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
                 deferred.addSyncCallback {
-                    self.callbackResults += a + $0
+                    (value: Int) in
+                    self.callbackResult += a + value
                 }
             }
             dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
                 deferred.addSyncErrback {
                     (e: NSError) in
-                    self.errbackResults += a
+                    self.errbackResult += a
                 }
             }
         }
@@ -54,13 +55,13 @@ class DeferredTests: XCTestCase {
         dispatch_group_wait(group, DISPATCH_TIME_FOREVER)
 
         deferred.addSyncAlways {
-            self.alwaysResults += 50
+            self.alwaysResult += 50
         }
 
         return deferred
     }
 
-    func testSyncCallback() {
+    func testMultithreadedCallbackCreation() {
         let count = 50
         let deferred: Deferred<Int> = createSyncDefereedMutithreaded(count)
 
@@ -74,15 +75,15 @@ class DeferredTests: XCTestCase {
         deferred.fulfill(value)
         deferred.reject(NSError(domain: "", code: 0, userInfo: nil))
 
-        XCTAssertEqual(callbackResults, count * value + (count * (count - 1)) / 2)
-        XCTAssertEqual(alwaysResults, 100)
-        XCTAssertEqual(errbackResults, 0)
+        XCTAssertEqual(callbackResult, count * value + (count * (count - 1)) / 2)
+        XCTAssertEqual(alwaysResult, 100)
+        XCTAssertEqual(errbackResult, 0)
 
         XCTAssert(deferred.state.fulfilled)
         XCTAssert(deferred.state.resolved)
     }
 
-    func testSyncErrback() {
+    func testMultithreadedErrbackCreation() {
         let count = 50
         let deferred: Deferred<Int> = createSyncDefereedMutithreaded(count)
 
@@ -95,9 +96,9 @@ class DeferredTests: XCTestCase {
         deferred.reject(NSError(domain: "", code: 0, userInfo: nil))
         deferred.fulfill(10)
 
-        XCTAssertEqual(callbackResults, 0)
-        XCTAssertEqual(alwaysResults, 100)
-        XCTAssertEqual(errbackResults, (count * (count - 1)) / 2)
+        XCTAssertEqual(callbackResult, 0)
+        XCTAssertEqual(alwaysResult, 100)
+        XCTAssertEqual(errbackResult, (count * (count - 1)) / 2)
 
         XCTAssert(!deferred.state.fulfilled)
         XCTAssert(deferred.state.resolved)

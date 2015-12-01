@@ -46,7 +46,7 @@ public class Deferred<T> {
             _lock.unlock()
         case .Fulfilled(let value):
             _lock.unlock()
-            callback(value.boxed)
+            callback(value)
         case .Rejected(_ ):
             _lock.unlock()
         }
@@ -97,7 +97,7 @@ public class Deferred<T> {
             _lock.unlock()
             return
         }
-        _state = .Fulfilled(Box(value))
+        _state = .Fulfilled(value)
         _lock.unlock()
 
         for callback in _callbacks {

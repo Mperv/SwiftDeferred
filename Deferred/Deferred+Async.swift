@@ -105,7 +105,7 @@ extension Deferred {
             let result: ChainResult<TOut> = transform(value)
             switch result {
             case .Fulfilment(let resultValue):
-                newDeferred.fulfill(resultValue.boxed)
+                newDeferred.fulfill(resultValue)
             case .Error(let error):
                 newDeferred.reject(error)
             }

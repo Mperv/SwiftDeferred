@@ -18,11 +18,11 @@ extension Deferred {
             NSURLConnection.sendAsynchronousRequest(request
                     , queue: NSOperationQueue.mainQueue()
                     , completionHandler: {
-                (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+                (response: NSURLResponse?, data: NSData?, error: NSError?) -> Void in
                 if (data != nil) {
                     newDeferred.fulfill(response!, data!)
                 } else {
-                    newDeferred.reject(error)
+                    newDeferred.reject(error!)
                 }
             })
         }

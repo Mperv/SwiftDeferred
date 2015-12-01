@@ -106,10 +106,10 @@ class DeferredTests: XCTestCase {
 
     func testChainExecution() {
         let test: String = "Let's test using some text!"
-        var deferred = Deferred<String>()
+        let deferred = Deferred<String>()
         var chained = deferred
 
-        for c: Character in test {
+        for c: Character in test.characters {
             chained = chained.chain(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
                 (s: String) -> ChainResult<String> in
                 return ChainResult(s + String(c))

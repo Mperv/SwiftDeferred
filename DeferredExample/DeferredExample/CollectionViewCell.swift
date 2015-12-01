@@ -23,17 +23,17 @@ class CollectionViewCell: UICollectionViewCell {
 
         super.init(frame: frame)
 
-        _imageView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        _imageView.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(_imageView)
 
-        _activityIndicatorView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        _activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(_activityIndicatorView)
 
 
         let viewsDictionary: [String:AnyObject] = ["image": _imageView]
 
-        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[image]|", options: NSLayoutFormatOptions(0), metrics: nil, views: viewsDictionary))
-        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[image]|", options: NSLayoutFormatOptions(0), metrics: nil, views: viewsDictionary))
+        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[image]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary))
+        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[image]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary))
 
         self.contentView.addConstraint(NSLayoutConstraint(item: _activityIndicatorView, attribute: .CenterX, relatedBy: .Equal
                 , toItem: self.contentView, attribute: .CenterX, multiplier: 1, constant: 0))
@@ -41,7 +41,7 @@ class CollectionViewCell: UICollectionViewCell {
                 , toItem: self.contentView, attribute: .CenterY, multiplier: 1, constant: 0))
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

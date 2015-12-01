@@ -73,7 +73,7 @@ extension Deferred {
     'transform' function executes in provided queue.
     */
     public func chain<TOut>(queue: dispatch_queue_t, transform: (Deferred<TOut>, T) -> Void) -> Deferred<TOut> {
-        var newDeferred = Deferred<TOut>()
+        let newDeferred = Deferred<TOut>()
         addCallback(queue) {
             (value: T) -> Void in
             transform(newDeferred, value)

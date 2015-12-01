@@ -18,7 +18,7 @@ class CollectionViewController: UICollectionViewController {
         super.init(collectionViewLayout: layout)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -32,7 +32,7 @@ class CollectionViewController: UICollectionViewController {
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        var cell: CollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier(_reuseIdentifier, forIndexPath: indexPath) as! CollectionViewCell
+        let cell: CollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier(_reuseIdentifier, forIndexPath: indexPath) as! CollectionViewCell
         cell.setup(_list[indexPath.row])
         return cell
     }

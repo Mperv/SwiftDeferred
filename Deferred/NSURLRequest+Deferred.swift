@@ -14,11 +14,11 @@ extension NSURLRequest {
         NSURLConnection.sendAsynchronousRequest(self
                 , queue: NSOperationQueue.mainQueue()
                 , completionHandler: {
-            (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+            (response: NSURLResponse?, data: NSData?, error: NSError?) -> Void in
             if (data != nil) {
                 deferred.fulfill(response!, data!)
             } else {
-                deferred.reject(error)
+                deferred.reject(error!)
             }
         })
         return deferred

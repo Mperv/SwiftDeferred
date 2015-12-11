@@ -18,6 +18,7 @@
 		4D9CAA3A1A1A2F060042F402 /* Deferred+NSURLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9CAA391A1A2F060042F402 /* Deferred+NSURLRequest.swift */; };
 		4D9CAA3C1A1A30210042F402 /* Deferred+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9CAA3B1A1A30210042F402 /* Deferred+Async.swift */; };
 		586030AB0F5BA2C363712D99 /* DeferredState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9CAA351A1A2E200042F402 /* DeferredState.swift */; };
+		586031A25161CC73421E7C42 /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58603AD93B3278D7398B2F49 /* Box.swift */; };
 		586032E20D548478B5AEE463 /* StringArrayViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5860316345D58C078A3CA954 /* StringArrayViewer.swift */; };
 		5860338101676A73DA5E309A /* NSURLRequest+Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58603797807870A221FB36E5 /* NSURLRequest+Deferred.swift */; };
 		586033A4227682EC6100173A /* UrlsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586031C89603FDC9F8714CE3 /* UrlsList.swift */; };
@@ -26,6 +27,7 @@
 		5860361D898B19C36AE295EF /* NSURLRequest+Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58603797807870A221FB36E5 /* NSURLRequest+Deferred.swift */; };
 		586036D1C744A3EE53250561 /* Deferred.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9CAA331A1A21910042F402 /* Deferred.swift */; };
 		58603B271B2E93304DD65256 /* ErrorConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586033113B1C0F8E692865AA /* ErrorConstants.swift */; };
+		58603D23988205538CB4EAF8 /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58603AD93B3278D7398B2F49 /* Box.swift */; };
 		58603DBA682206EAC117B7E9 /* ChainResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9CAA371A1A2E570042F402 /* ChainResult.swift */; };
 		58603F04080520290DC13529 /* ImageHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5860393BF65AAC0C8C4E70C5 /* ImageHelpers.swift */; };
 		58603FC93000D8A9A74F7A6A /* Deferred+NSURLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9CAA391A1A2F060042F402 /* Deferred+NSURLRequest.swift */; };
@@ -64,6 +66,7 @@
 		58603797807870A221FB36E5 /* NSURLRequest+Deferred.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSURLRequest+Deferred.swift"; sourceTree = "<group>"; };
 		5860393BF65AAC0C8C4E70C5 /* ImageHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageHelpers.swift; sourceTree = "<group>"; };
 		58603A5212889EE76F09243C /* ImageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
+		58603AD93B3278D7398B2F49 /* Box.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +153,7 @@
 				4D9CAA371A1A2E570042F402 /* ChainResult.swift */,
 				4D9CAA391A1A2F060042F402 /* Deferred+NSURLRequest.swift */,
 				4D9CAA3B1A1A30210042F402 /* Deferred+Async.swift */,
+				58603AD93B3278D7398B2F49 /* Box.swift */,
 				58603797807870A221FB36E5 /* NSURLRequest+Deferred.swift */,
 			);
 			name = Deferred;
@@ -277,6 +281,7 @@
 				4D9CAA131A1A21060042F402 /* AppDelegate.swift in Sources */,
 				4D9CAA381A1A2E570042F402 /* ChainResult.swift in Sources */,
 				4D9CAA3A1A1A2F060042F402 /* Deferred+NSURLRequest.swift in Sources */,
+				586031A25161CC73421E7C42 /* Box.swift in Sources */,
 				5860338101676A73DA5E309A /* NSURLRequest+Deferred.swift in Sources */,
 				58603B271B2E93304DD65256 /* ErrorConstants.swift in Sources */,
 				586034ED07527D4B554C3905 /* ImageLoader.swift in Sources */,
@@ -297,6 +302,7 @@
 				5860361D898B19C36AE295EF /* NSURLRequest+Deferred.swift in Sources */,
 				58603FC93000D8A9A74F7A6A /* Deferred+NSURLRequest.swift in Sources */,
 				5860353AA20BC980501F694F /* Deferred+Async.swift in Sources */,
+				58603D23988205538CB4EAF8 /* Box.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

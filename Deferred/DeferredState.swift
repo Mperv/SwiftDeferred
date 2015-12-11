@@ -18,11 +18,11 @@ Deferred can be in three states:
 
 public enum DeferredState<T> {
     case None
-    case Fulfilled(T)
+    case Fulfilled(Box<T>)
     case Rejected(NSError)
 
     init(_ value: T) {
-        self = .Fulfilled(value)
+        self = .Fulfilled(Box(value))
     }
 
     init(_ error: NSError) {
@@ -59,7 +59,7 @@ public enum DeferredState<T> {
     var value: T? {
         switch self {
         case .Fulfilled(let value):
-            return value
+            return value.boxed
         default:
             return nil
         }

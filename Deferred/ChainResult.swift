@@ -13,11 +13,11 @@ Represents result of chain operation.
 */
 
 public enum ChainResult<T> {
-    case Fulfilment(T)
+    case Fulfilment(Box<T>)
     case Error(NSError)
 
     init(_ value: T) {
-        self = .Fulfilment(value)
+        self = .Fulfilment(Box(value))
     }
 
     init(_ error: NSError) {
@@ -45,7 +45,7 @@ public enum ChainResult<T> {
     var value: T? {
         switch self {
         case .Fulfilment(let value):
-            return value
+            return value.boxed
         default:
             return nil
         }

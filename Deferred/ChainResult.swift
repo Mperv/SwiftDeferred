@@ -25,29 +25,17 @@ public enum ChainResult<T> {
     }
 
     var fulfilled: Bool {
-        switch self {
-        case .Fulfilment(_ ):
-            return true
-        default:
-            return false
-        }
+        if case .Fulfilment(_) = self { return true }
+        return false
     }
 
     var error: NSError? {
-        switch self {
-        case .Error(let error):
-            return error
-        default:
-            return nil
-        }
+        if case let .Error(error) = self { return error }
+        return nil
     }
 
     var value: T? {
-        switch self {
-        case .Fulfilment(let value):
-            return value.boxed
-        default:
-            return nil
-        }
+        if case let .Fulfilment(value) = self { return value.boxed }
+        return nil
     }
 }

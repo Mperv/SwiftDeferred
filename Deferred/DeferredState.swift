@@ -30,38 +30,22 @@ public enum DeferredState<T> {
     }
 
     var fulfilled: Bool {
-        switch self {
-        case .Fulfilled(_ ):
-            return true
-        default:
-            return false
-        }
+        if case .Fulfilled(_) = self { return true }
+        return false
     }
 
     var resolved: Bool {
-        switch self {
-        case .None:
-            return false
-        default:
-            return true
-        }
+        if case .None = self { return false }
+        return true
     }
 
     var error: NSError? {
-        switch self {
-        case .Rejected(let error):
-            return error
-        default:
-            return nil
-        }
+        if case let .Rejected(error) = self { return error }
+        return nil
     }
 
     var value: T? {
-        switch self {
-        case .Fulfilled(let value):
-            return value.boxed
-        default:
-            return nil
-        }
+        if case let .Fulfilled(value) = self { return value.boxed }
+        return nil
     }
 }

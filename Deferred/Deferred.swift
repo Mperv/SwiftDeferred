@@ -20,15 +20,11 @@ Once resolved (either fulfilled or rejected) Deferred should be unable to change
 public class Deferred<T> {
     private var _lock: NSLock = NSLock()
 
-    private var _callbacks: Array<(T) -> Void> = Array<(T) -> Void>()
-    private var _errbacks: Array<(NSError) -> Void> = Array<(NSError) -> Void>()
+    private var _callbacks: [(T) -> Void] = []
+    private var _errbacks: [(NSError) -> Void] = []
 
     private var _state: DeferredState<T>
-    public var state: DeferredState<T> {
-        get {
-            return _state
-        }
-    }
+    public var state: DeferredState<T> { return _state }
 
     public init() {
         _state = .None
